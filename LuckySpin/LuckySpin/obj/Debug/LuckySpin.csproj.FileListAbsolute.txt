@@ -1,0 +1,13 @@
+D:\Tungcoi\ha\LuckySpin\LuckySpin\bin\Debug\LuckySpin.exe.config
+D:\Tungcoi\ha\LuckySpin\LuckySpin\bin\Debug\LuckySpin.exe
+D:\Tungcoi\ha\LuckySpin\LuckySpin\bin\Debug\LuckySpin.pdb
+D:\Tungcoi\ha\LuckySpin\LuckySpin\obj\Debug\MainWindow.baml
+D:\Tungcoi\ha\LuckySpin\LuckySpin\obj\Debug\MainWindow.g.cs
+D:\Tungcoi\ha\LuckySpin\LuckySpin\obj\Debug\App.g.cs
+D:\Tungcoi\ha\LuckySpin\LuckySpin\obj\Debug\LuckySpin_MarkupCompile.cache
+D:\Tungcoi\ha\LuckySpin\LuckySpin\obj\Debug\LuckySpin.g.resources
+D:\Tungcoi\ha\LuckySpin\LuckySpin\obj\Debug\LuckySpin.Properties.Resources.resources
+D:\Tungcoi\ha\LuckySpin\LuckySpin\obj\Debug\LuckySpin.csproj.GenerateResource.Cache
+D:\Tungcoi\ha\LuckySpin\LuckySpin\obj\Debug\LuckySpin.exe
+D:\Tungcoi\ha\LuckySpin\LuckySpin\obj\Debug\LuckySpin.pdb
+D:\Tungcoi\ha\LuckySpin\LuckySpin\obj\Debug\LuckySpin.csprojResolveAssemblyReference.cache
