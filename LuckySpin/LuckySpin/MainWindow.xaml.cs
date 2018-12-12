@@ -45,7 +45,13 @@ namespace LuckySpin
 
         void timer_Tick(object sender, EventArgs e)
         {
-
+            var mainUri = new Uri("file:///" + imgs[pos]);
+            var bitmap = new BitmapImage();
+            bitmap.BeginInit();
+            bitmap.UriSource = mainUri;
+            bitmap.DecodePixelWidth = 600;
+            bitmap.EndInit();
+            mainImg.Source = bitmap;
             int pre = pos - 1;
             if (pre < 0)
                 pre = ls.Count - 1;
@@ -54,6 +60,8 @@ namespace LuckySpin
             pos++;
             if (pos >= ls.Count)
                 pos = 0;
+           
+            
         }
 
       
@@ -139,12 +147,12 @@ namespace LuckySpin
                         }
                         else
                         {
-                            uri = new Uri("file:///" + "D:\\female.png");
+                            uri = new Uri("file:///" + "C:\\Images\\face.png");
                         }
                         var bitmap = new BitmapImage();
                         bitmap.BeginInit();
                         bitmap.UriSource = uri;
-                        bitmap.DecodePixelWidth = 200;
+                        bitmap.DecodePixelWidth = 100;
                         bitmap.EndInit();
                         Image img = new Image();
                         img.Source = bitmap;

@@ -1,0 +1,15 @@
+﻿<Window x:Class="VongQuayMayMan.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:VongQuayMayMan"
+        mc:Ignorable="d"
+        Closing="Window_Closing"
+        Title="MainWindow" Height="350" Width="525">
+    <Grid>
+        <Button Height="30" Width="80" Content="Chọn Ảnh" Click="Button_Click" Margin="74,152,364.4,138.8"></Button>
+        <Button Height="30" Width="80" Content="Bắt đầu" Click="Button_Click_1" Margin="206,152,232.4,138.8"></Button>
+        <Button Height="30" Width="80" Content="Ngừng" Click="Button_Click_2" Margin="330,152,108.4,138.8"></Button>
+    </Grid>
+</Window>
