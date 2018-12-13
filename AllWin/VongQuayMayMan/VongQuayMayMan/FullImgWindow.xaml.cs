@@ -23,23 +23,30 @@ namespace VongQuayMayMan
     {
         List<String> imgSources;
         List<UserImg> lsImgs;
+        List<DoubleAnimation> lsAnimation;
+        
         UserImg mainImg;
+        UserImg luckyImg;
         int gridSize;
         public int RotateMode;
+        public bool isRemove;
 
-        DispatcherTimer timer;
         DispatcherTimer rotateTimer;
         DispatcherTimer Awardtimer;
 
+        bool isStopFade;
+
         int pre, next;
-        public FullImgWindow(List<String> ls)
+        public FullImgWindow(List<String> ls, int rMode = 2, bool rem = false)
         {
             InitializeComponent();
             imgSources = new List<string>();
             lsImgs = new List<UserImg>();
-            timer = new DispatcherTimer();
-            timer.Tick += Timer_Tick;
-            timer.Interval = TimeSpan.FromMilliseconds(700);
+            lsAnimation = new List<DoubleAnimation>();
+
+            isStopFade = true;
+            isRemove = rem;
+            RotateMode = rMode;
 
             rotateTimer = new DispatcherTimer();
             rotateTimer.Tick += RotateTimer_Tick;
@@ -49,7 +56,7 @@ namespace VongQuayMayMan
                 imgSources.Add(src);
             }
             InitGrid();
-            RotateMode = 3;
+            
             pre = 0;
             next = 0;
         }
@@ -68,8 +75,14 @@ namespace VongQuayMayMan
                 case 3: //trai phai
                     next = pre + 1;
                     if (next >= lsImgs.Count)
+                    {
                         next = 0;
-                    while (lsImgs[next] == null) next++;
+                    }
+                    while (lsImgs[next] == null) {
+                        next++;
+                        if (next >= lsImgs.Count)
+                        next = 0;
+                    }
                     break;
                 case 4: //tren duoi
                     //next = pre + gridSize;
@@ -86,29 +99,55 @@ namespace VongQuayMayMan
             NextImage();
         }
 
-        private void Timer_Tick(object sender, EventArgs e)
+        private void fifo()
         {
+            if (isStopFade)
+                return;
             Random rand = new Random();
-            int trytime = 0;
             int i = rand.Next(lsImgs.Count);
-
-            while (lsImgs[i] == null || lsImgs[i].duringAnimation) {
-                trytime++;
-                if (trytime > 100) return;
+            while (lsImgs[i] == null || lsImgs[i].duringAnimation)
+            {
                 i = rand.Next(lsImgs.Count);
             }
-            trytime = 0;
-            int j = rand.Next(lsImgs.Count);
-            while (i == j || lsImgs[j] == null || lsImgs[j].duringAnimation) {
-                trytime++;
-                if (trytime > 100) return;
-                j = rand.Next(lsImgs.Count);
-            }
-            String temp = lsImgs[i].imgPath;
-
-            lsImgs[i].changeImgSource(lsImgs[j].imgPath, 0, 3000);
-            lsImgs[j].changeImgSource(temp, 0, 3000);
+            var animation = new DoubleAnimation
+            {
+                To = 0,
+                BeginTime = TimeSpan.FromSeconds(rand.Next(3)),
+                FillBehavior = FillBehavior.Stop,
+                Duration = new Duration(TimeSpan.FromMilliseconds(3000)),
+                AutoReverse = true
+            };
+            animation.Completed += (x, y) =>
+            {
+                lsImgs[i].duringAnimation = false;
+                fifo();
+            };
+            lsImgs[i].duringAnimation = true;
+            lsImgs[i].BeginAnimation(UIElement.OpacityProperty, animation);
         }
+        //private void Timer_Tick(object sender, EventArgs e)
+        //{
+        //    Random rand = new Random();
+        //    int trytime = 0;
+        //    int i = rand.Next(lsImgs.Count);
+
+        //    while (lsImgs[i] == null || lsImgs[i].duringAnimation) {
+        //        trytime++;
+        //        if (trytime > 100) return;
+        //        i = rand.Next(lsImgs.Count);
+        //    }
+        //    trytime = 0;
+        //    int j = rand.Next(lsImgs.Count);
+        //    while (i == j || lsImgs[j] == null || lsImgs[j].duringAnimation) {
+        //        trytime++;
+        //        if (trytime > 100) return;
+        //        j = rand.Next(lsImgs.Count);
+        //    }
+        //    String temp = lsImgs[i].imgPath;
+
+        //    lsImgs[i].changeImgSource(lsImgs[j].imgPath, 0, 3000);
+        //    lsImgs[j].changeImgSource(temp, 0, 3000);
+        //}
 
         private void InitGrid()
         {
@@ -171,27 +210,26 @@ namespace VongQuayMayMan
             {
                 WindowStyle = WindowStyle.None;
                 ResizeMode = ResizeMode.NoResize;
+                isStopFade = false;
+                for (int i = 0; i < lsImgs.Count / 2; i++)
+                {
+                    fifo();
+                }
             }
-        }
-
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            timer.Start();
         }
 
         public void startRotate()
         {
+            endRotation();
+            isStopFade = true;
             foreach(var item in lsImgs)
             {
                 if (item != null)
                 {
-                    item.stopAnimation();
+                    item.BeginAnimation(UIElement.OpacityProperty, null);
                 }
             }
-            if (timer.IsEnabled)
-            {
-                timer.Stop();
-            }
+            
             if (rotateTimer.IsEnabled)
             {
                 rotateTimer.Stop();
@@ -217,6 +255,10 @@ namespace VongQuayMayMan
 
         public void StopRotate()
         {
+            if (!rotateTimer.IsEnabled)
+            {
+                return;
+            }
             rotateTimer.Stop();
             lsImgs[next].Visibility = System.Windows.Visibility.Visible;
             animationDelay = 100;
@@ -249,7 +291,7 @@ namespace VongQuayMayMan
                 animation.RepeatBehavior = RepeatBehavior.Forever;
                 Awardtimer = new DispatcherTimer();
                 Awardtimer.Tick += Awardtimer_Tick;
-                Awardtimer.Interval = TimeSpan.FromSeconds(4);
+                Awardtimer.Interval = TimeSpan.FromSeconds(2);
                 Awardtimer.Start();
             }
             
@@ -262,7 +304,57 @@ namespace VongQuayMayMan
         private void Awardtimer_Tick(object sender, EventArgs e)
         {
             lsImgs[next].BeginAnimation(UIElement.OpacityProperty, null);
+           
             Awardtimer.Stop();
+            
+            luckyImg = new UserImg(lsImgs[next].imgPath, 1000);
+
+
+            luckyImg.SetValue(Grid.RowProperty, 0);
+            luckyImg.SetValue(Grid.ColumnProperty, 0);
+            luckyImg.SetValue(Grid.RowSpanProperty, gridSize);
+            luckyImg.SetValue(Grid.ColumnSpanProperty, gridSize);
+            grid.Children.Add(luckyImg);
+            
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        public void endRotation()
+        {
+            if (luckyImg == null)
+            {
+                return;
+            }
+            grid.Children.Remove(luckyImg);
+            luckyImg = null;
+            if (isRemove)
+            {
+                string removePath = lsImgs[next].imgPath;
+                for (int i = 0; i < lsImgs.Count; i++)
+                {
+                    if (lsImgs[i] != null && lsImgs[i].imgPath.Equals(removePath))
+                    {
+                        lsImgs[i] = null;
+                    }
+                }
+                Random ran = new Random();
+
+                while (lsImgs[next] == null)
+                    next = ran.Next(lsImgs.Count);
+                pre = next;
+            }
+        }
+
+        private void Window_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Escape)
+            {
+                endRotation();
+            }
         }
     }
 }

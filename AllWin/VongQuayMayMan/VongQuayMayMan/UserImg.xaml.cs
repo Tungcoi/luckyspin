@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -88,26 +89,46 @@ namespace VongQuayMayMan
         {
             if (String.IsNullOrEmpty(imgPath))
                 return;
-            var uri = new Uri("file:///" + imgPath);
-            var bitmap = new BitmapImage();
-            bitmap.BeginInit();
-            bitmap.UriSource = uri;
-            bitmap.DecodePixelWidth = imgpxl;
-            bitmap.EndInit();
-            bitmap.Freeze();
-            img.Source = bitmap;
+            try
+            {
+                var uri = new Uri("file:///" + imgPath);
+                var bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.UriSource = uri;
+                bitmap.DecodePixelWidth = imgpxl;
+                bitmap.EndInit();
+                bitmap.Freeze();
+                img.Source = bitmap;
+            } catch (Exception ex)
+            {
+                MessageBox.Show("Không thể load ảnh " + imgPath);
+                string mydocpath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                string[] lines = { DateTime.Now.ToString(), ex.Message };
+                File.AppendAllLines(System.IO.Path.Combine(mydocpath, "LuckySprinErrorLog.txt"), lines);
+            }
+           
         }
 
         public void changeSource(String path)
         {
-            var uri = new Uri("file:///" + path);
-            var bitmap = new BitmapImage();
-            bitmap.BeginInit();
-            bitmap.UriSource = uri;
-            bitmap.DecodePixelWidth = imgpxl;
-            bitmap.EndInit();
-            img.Source = bitmap;
-            imgPath = path;
+            try
+            {
+                var uri = new Uri("file:///" + path);
+                var bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.UriSource = uri;
+                bitmap.DecodePixelWidth = imgpxl;
+                bitmap.EndInit();
+                img.Source = bitmap;
+                imgPath = path;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Không thể load ảnh " + imgPath);
+                string mydocpath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                string[] lines = { DateTime.Now.ToString(), ex.Message };
+                File.AppendAllLines(System.IO.Path.Combine(mydocpath, "LuckySprinErrorLog.txt"), lines);
+            }
         }
 
         public void stopAnimation()

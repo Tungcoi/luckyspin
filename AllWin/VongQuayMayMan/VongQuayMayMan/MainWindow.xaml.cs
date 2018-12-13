@@ -52,7 +52,18 @@ namespace VongQuayMayMan
                 {
                     imgs.Add(path);
                 }
-                fWd = new FullImgWindow(imgs);
+                //if (imgs.Count > 300)
+                //{
+                //    MessageBox.Show("Vui lòng chọn số lượng ảnh nhỏ hơn 300");
+                //    return;
+                //}
+                int rotatemode = 1;
+                if (ngaunhien.IsChecked == true) rotatemode = 2;
+                if (traiphai.IsChecked == true) rotatemode = 3;
+                if (trenduoi.IsChecked == true) rotatemode = 4;
+
+                bool isremove = (loaibo.IsChecked == true);
+                fWd = new FullImgWindow(imgs, rotatemode, isremove);
                 fWd.Show();
             }
         }
@@ -68,17 +79,32 @@ namespace VongQuayMayMan
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            if (fWd != null)
+            if (fWd != null && fWd.IsEnabled)
             {
+                int rotatemode = 1;
+                if (ngaunhien.IsChecked == true) rotatemode = 2;
+                if (traiphai.IsChecked == true) rotatemode = 3;
+                if (trenduoi.IsChecked == true) rotatemode = 4;
+                fWd.RotateMode = rotatemode;
                 fWd.startRotate();
             }
         }
 
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
-            if (fWd != null)
+            if (fWd != null && fWd.IsEnabled)
             {
+                bool isremove = (loaibo.IsChecked == true);
+                fWd.isRemove = isremove;
                 fWd.StopRotate();
+            }
+        }
+
+        private void Window_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Escape && fWd != null && fWd.IsEnabled)
+            {
+                fWd.endRotation();
             }
         }
     }

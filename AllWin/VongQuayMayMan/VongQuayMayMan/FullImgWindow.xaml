@@ -5,8 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:VongQuayMayMan"
         StateChanged="Window_StateChanged"
-        Loaded="Window_Loaded"
         mc:Ignorable="d"
+        KeyUp="Window_KeyUp"
         Title="FullImgWindow" Height="600" Width="900">
     <Grid x:Name="grid">
         <Grid.Background>

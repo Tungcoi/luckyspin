@@ -4,12 +4,63 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:VongQuayMayMan"
+        KeyUp="Window_KeyUp"
         mc:Ignorable="d"
         Closing="Window_Closing"
-        Title="MainWindow" Height="350" Width="525">
+        ResizeMode="NoResize"
+        Title="MainWindow" Height="400" Width="600">
     <Grid>
-        <Button Height="30" Width="80" Content="Chọn Ảnh" Click="Button_Click" Margin="74,152,364.4,138.8"></Button>
-        <Button Height="30" Width="80" Content="Bắt đầu" Click="Button_Click_1" Margin="206,152,232.4,138.8"></Button>
-        <Button Height="30" Width="80" Content="Ngừng" Click="Button_Click_2" Margin="330,152,108.4,138.8"></Button>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Border Grid.Row="0"  BorderBrush="Blue" BorderThickness="1" Margin="2" CornerRadius="3">
+            <Grid >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="2*"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0" Height="30" Width="80" Content="Chọn Ảnh" Click="Button_Click" ></Button>
+                <StackPanel Grid.Column="1">
+                    <Label Margin="10,2,0,2" FontWeight="Bold">Chọn ảnh với số lượng nhỏ hơn 300 ảnh.</Label>
+                    <Label Margin="10,2,0,2" FontWeight="Bold">Ảnh có kích thước quá lớn chương trình có thể bị ngưng.</Label>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="1"  BorderBrush="Blue" BorderThickness="1" Margin="2" CornerRadius="3">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="2*"/>
+                </Grid.ColumnDefinitions>
+                <Button Height="30" Width="80" Content="Bắt đầu" Click="Button_Click_1" ></Button>
+                <StackPanel Grid.Column="1">
+                    <Label FontWeight="Bold">Chế độ quay thưởng?</Label>
+                    <RadioButton x:Name="xoanoc" GroupName="rotatemode" IsEnabled="False">Xoắn ốc</RadioButton>
+                    <RadioButton x:Name="ngaunhien" GroupName="rotatemode" IsChecked="True" >Ngẫu Nhiên</RadioButton>
+                    <RadioButton x:Name="traiphai" GroupName="rotatemode">Từ trái qua phải</RadioButton>
+                    <RadioButton x:Name="trenduoi" GroupName="rotatemode" IsEnabled="False">Từ trên xuống dưới</RadioButton>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="2"  BorderBrush="Blue" BorderThickness="1" Margin="2" CornerRadius="3">
+            <Grid >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="2*"/>
+                </Grid.ColumnDefinitions>
+                <Button Height="30" Width="80" Content="Ngừng" Click="Button_Click_2" ></Button>
+                <StackPanel Grid.Column="1">
+                    <Label FontWeight="Bold">Loại người trúng thưởng rồi?</Label>
+                    <RadioButton x:Name="loaibo" GroupName="removemode" IsChecked="True">Loại bỏ</RadioButton>
+                    <RadioButton GroupName="removemode" >Không loại</RadioButton>
+                </StackPanel>
+            </Grid>
+        </Border>
+       
+        
     </Grid>
 </Window>

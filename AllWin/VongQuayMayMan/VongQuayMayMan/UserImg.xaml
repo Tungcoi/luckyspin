@@ -8,8 +8,6 @@
              Loaded="UserControl_Loaded"
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
-
-
-        <Image x:Name="img" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" ></Image>
+        <Image x:Name="img" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="1"></Image>
     </Grid>
 </UserControl>
