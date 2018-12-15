@@ -8,6 +8,7 @@
         mc:Ignorable="d"
         KeyUp="Window_KeyUp"
         Title="FullImgWindow" Height="600" Width="900">
+    
     <Grid x:Name="grid">
         <Grid.Background>
             <ImageBrush ImageSource="pack://application:,,,/Resources/logo.png" Stretch="Uniform"/>

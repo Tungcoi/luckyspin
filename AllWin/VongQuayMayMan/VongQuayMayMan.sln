@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+# Blend for Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VongQuayMayMan", "VongQuayMayMan\VongQuayMayMan.csproj", "{7E17A1FF-1F17-40BB-9C29-F73BDAEC8C8C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LuckySpiner", "LuckySpiner\LuckySpiner.csproj", "{E635191B-EC1B-4154-84F2-B827C39B997F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{7E17A1FF-1F17-40BB-9C29-F73BDAEC8C8C}.Debug|Any CPU.Build.0 = Release|Any CPU
 		{7E17A1FF-1F17-40BB-9C29-F73BDAEC8C8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7E17A1FF-1F17-40BB-9C29-F73BDAEC8C8C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E635191B-EC1B-4154-84F2-B827C39B997F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E635191B-EC1B-4154-84F2-B827C39B997F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E635191B-EC1B-4154-84F2-B827C39B997F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E635191B-EC1B-4154-84F2-B827C39B997F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
