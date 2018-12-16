@@ -164,7 +164,7 @@ namespace LuckySpiner
                                 return;
                             }
                         }
-                        drawingContext.DrawImage(bi, new Rect(i * tileWidth + 1, j * tileHeight + 1, tileWidth - 2, tileHeight - 2));
+                        drawingContext.DrawImage(bi, new Rect(j * tileWidth + 1, i * tileHeight + 1, tileWidth - 2, tileHeight - 2));
                         GC.Collect();
                         pos = (pos  + 1) % imgsPth.Count;
                     }

@@ -65,6 +65,8 @@ namespace LuckySpiner
         DispatcherTimer rotateTimer;
         private int curentPos, nextPos;
 
+        DoubleAnimation flickerAnimation;
+
         private string logoPath;
 
         public SpinerWindow(string lgpth, String bg, List<String> imgsPth, int size)
@@ -148,9 +150,16 @@ namespace LuckySpiner
 
             rotateTimer = new DispatcherTimer();
             rotateTimer.Tick += RotateTimer_Tick;
-            rotateTimer.Interval = TimeSpan.FromMilliseconds(30);
+            rotateTimer.Interval = TimeSpan.FromMilliseconds(50);
             curentPos = 0;
             nextPos = 0;
+
+            flickerAnimation = new DoubleAnimation();
+            flickerAnimation.From = 0;
+            flickerAnimation.To = 1;
+            flickerAnimation.Duration = new Duration(TimeSpan.FromMilliseconds(50));
+            flickerAnimation.AutoReverse = true;
+            flickerAnimation.RepeatBehavior = RepeatBehavior.Forever;
 
             logoPath = lgpth;
             BitmapImage logobmp = new BitmapImage();
@@ -439,6 +448,7 @@ namespace LuckySpiner
                 case 3: //up
                 case 4: //down
                     grids[curentPos].Visibility = Visibility.Visible;
+                    grids[curentPos].BeginAnimation(UIElement.OpacityProperty, flickerAnimation);
                     rotateTimer.Stop();
                     break;
                 case 5: //scroll
@@ -487,9 +497,12 @@ namespace LuckySpiner
                     break;
                 }
             }
-            System.Threading.Thread.Sleep(1000);
+            System.Threading.Thread.Sleep(2000);
             Dispatcher.Invoke(() => awardImg.Visibility = Visibility.Visible);
             Dispatcher.Invoke(() => winner.Visibility = Visibility.Visible);
+            Dispatcher.Invoke(() => {
+                grids[curentPos].BeginAnimation(UIElement.OpacityProperty, null);
+            });
             BitmapImage bi2 = new BitmapImage();
             bi2.BeginInit();
             bi2.DecodePixelHeight = 400;
