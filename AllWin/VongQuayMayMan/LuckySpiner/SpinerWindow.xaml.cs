@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Media;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -54,6 +55,8 @@ namespace LuckySpiner
 
         DispatcherTimer countDownTimer;
         private int countDownValue;
+        //SoundPlayer player;
+        //private bool isplayingSound;
 
         public SpinerWindow(String bg, List<String> imgsPth)
         {
@@ -99,6 +102,10 @@ namespace LuckySpiner
             countDownTimer.Tick += CountDownTimer_Tick;
             countDownTimer.Interval = TimeSpan.FromSeconds(1);
             countDownValue = 5;
+
+            //player = new SoundPlayer(@"C:\Users\tuenh\Downloads\tick.wav");
+            //player.Load();
+            //isplayingSound = false;
         }
 
         private void CountDownTimer_Tick(object sender, EventArgs e)
@@ -126,7 +133,7 @@ namespace LuckySpiner
                     btnMode = 0;
                     animationDuration = 5000;
                     isRotate = false;
-                    rotateBtn.Content = "Quay thưởng";
+                    
                     storyboard.Stop();
                     doAnimation(rotateMode, animationDuration);
 
@@ -181,6 +188,8 @@ namespace LuckySpiner
             bi.EndInit();
             bi.Freeze();
             Dispatcher.Invoke(() => mainImg.Source = bi);
+            //player.Stop();
+            //player.Play();
         }
 
         private string getPath(double horizontalOffset)
@@ -288,7 +297,8 @@ namespace LuckySpiner
             }
             else
             {
-                rotateBtn.IsEnabled = false;
+                rotateBtn.Visibility = Visibility.Hidden;
+                rotateBtn.Content = "Quay thưởng";
                 countDownValue = 5;
                 countDownTimer.Start();
             }
@@ -337,7 +347,7 @@ namespace LuckySpiner
         {
             awardImg.Visibility = Visibility.Hidden;
             winner.Visibility = Visibility.Hidden;
-            rotateBtn.IsEnabled = true;
+            rotateBtn.Visibility = Visibility.Visible;
         }
         private void awardImg_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
@@ -346,7 +356,7 @@ namespace LuckySpiner
                 hideLucky();
             }
         }
-
+      
     }
 
 }
