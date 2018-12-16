@@ -44,33 +44,41 @@ namespace LuckySpiner
 
 
         private string mainPath;
-        private bool isRotate;
 
         DoubleAnimation rotateAnimation;
         Storyboard storyboard;
-        private int animationDuration;
 
         private int btnMode;
-        private bool rotateMode;
+        private int rotateMode;
 
         DispatcherTimer countDownTimer;
         private int countDownValue;
+
+        private bool isRotate;
         //SoundPlayer player;
         //private bool isplayingSound;
 
-        public SpinerWindow(String bg, List<String> imgsPth)
+        private int totalImgSize;
+        List<Grid> grids;
+        List<ImgIfo> gridsbinding;
+
+        DispatcherTimer rotateTimer;
+        private int curentPos, nextPos;
+
+        private string logoPath;
+
+        public SpinerWindow(string lgpth, String bg, List<String> imgsPth, int size)
         {
             InitializeComponent();
             BitmapImage bi = new BitmapImage(new Uri(bg));
             background.ImageSource = bi;
             lsImgInfo = new List<ImgIfo>();
-
-            foreach(var pth in imgsPth)
+            foreach (var pth in imgsPth)
             {
                 Image img = new Image();
                 BitmapImage bmi = new BitmapImage();
                 bmi.BeginInit();
-                bmi.DecodePixelHeight = 400;
+                bmi.DecodePixelHeight = 300;
                 bmi.UriSource = new Uri(pth);
                 bmi.EndInit();
                 img.Source = bmi;
@@ -82,8 +90,40 @@ namespace LuckySpiner
                 lsImgInfo.Add(info);
             }
 
+            //gen grid opacity
+            totalImgSize = size;
+            grids = new List<Grid>();
+            gridsbinding = new List<ImgIfo>();
+            for (int i = 0; i < totalImgSize; i++)
+            {
+                grid.ColumnDefinitions.Add(new ColumnDefinition());
+                grid.RowDefinitions.Add(new RowDefinition());
+            }
+            int temp = 0;
+            for (int i = 0; i < totalImgSize; i++)
+            {
+                for (int j = 0; j < totalImgSize; j++)
+                {
+                    Grid gridElement = new Grid();
+                    gridElement.Background = Brushes.Black;
+                    gridElement.Opacity = 0.5;
+                    gridElement.SetValue(Grid.RowProperty, i);
+                    gridElement.SetValue(Grid.ColumnProperty, j);
+                    gridElement.SetValue(Grid.RowSpanProperty, 1);
+                    gridElement.SetValue(Grid.ColumnSpanProperty, 1);
+                    grids.Add(gridElement);
+                    grid.Children.Add(gridElement);
+                    if (i >= (totalImgSize / 4) && i < (totalImgSize * 3 / 4) && j >= (totalImgSize / 4) && j < (totalImgSize * 3 / 4)) //mainImage 
+                    {
+                        gridsbinding.Add(null);
+                    } else
+                    {
+                        gridsbinding.Add(lsImgInfo[temp]);
+                        temp = (temp + 1) % lsImgInfo.Count;
+                    }
+                }
+            }
             mainPath = null;
-            isRotate = false;
             scroll.ScrollChanged += Scroll_ScrollChanged;
 
             rotateAnimation = new DoubleAnimation();
@@ -95,8 +135,7 @@ namespace LuckySpiner
             rotateAnimation.AutoReverse = true;
             rotateAnimation.RepeatBehavior = RepeatBehavior.Forever;
             btnMode = 0;
-            rotateMode = true;//left to right
-            animationDuration = 5000;
+            rotateMode = -1;
 
             countDownTimer = new DispatcherTimer();
             countDownTimer.Tick += CountDownTimer_Tick;
@@ -106,6 +145,91 @@ namespace LuckySpiner
             //player = new SoundPlayer(@"C:\Users\tuenh\Downloads\tick.wav");
             //player.Load();
             //isplayingSound = false;
+
+            rotateTimer = new DispatcherTimer();
+            rotateTimer.Tick += RotateTimer_Tick;
+            rotateTimer.Interval = TimeSpan.FromMilliseconds(30);
+            curentPos = 0;
+            nextPos = 0;
+
+            logoPath = lgpth;
+            BitmapImage logobmp = new BitmapImage();
+            logobmp.BeginInit();
+            logobmp.DecodePixelHeight = 400;
+            logobmp.UriSource = new Uri(logoPath);
+            logobmp.EndInit();
+            mainImg.Source = logobmp;
+        }
+
+        private void RotateTimer_Tick(object sender, EventArgs e)
+        {
+            if (!isRotate || !getNext()) return;
+            grids[curentPos].Visibility = Visibility.Visible;
+            grids[nextPos].Visibility = Visibility.Hidden;
+            BackgroundWorker bw = new BackgroundWorker();
+            bw.DoWork += Bw_DoWork;
+            mainPath = gridsbinding[nextPos].path;
+            bw.RunWorkerAsync(gridsbinding[nextPos].path);
+            curentPos = nextPos;
+        }
+
+        private bool getNext()
+        {
+            switch (rotateMode)
+            {
+                case 0: //random
+                    Random rd = new Random();
+                    do
+                    {
+                        nextPos = rd.Next(totalImgSize * totalImgSize);
+                    } while (nextPos == curentPos || gridsbinding[nextPos] == null || gridsbinding[nextPos].isLucky);
+                    return true;
+                case 1: //lef to right
+                    nextPos = (curentPos + 1) % (totalImgSize* totalImgSize);
+                    while (gridsbinding[nextPos] == null || gridsbinding[nextPos].isLucky)
+                    {
+                        nextPos = (nextPos + 1) % (totalImgSize * totalImgSize);
+                    }
+                    return true;
+                case 2: //Right to left
+                    nextPos = curentPos;
+                    do
+                    {
+                        nextPos--;
+                        if (nextPos < 0)
+                            nextPos = totalImgSize * totalImgSize - 1;
+                    } while (gridsbinding[nextPos] == null || gridsbinding[nextPos].isLucky);
+                  
+                    return true;
+                
+                case 3: //up
+                    nextPos = curentPos;
+                    do
+                    {
+                        if (nextPos == 0)
+                            nextPos = totalImgSize * totalImgSize - 1;
+                        else if (nextPos < totalImgSize)
+                            nextPos += totalImgSize * (totalImgSize - 1) - 1;
+                        else
+                            nextPos -= totalImgSize;
+                    } while (gridsbinding[nextPos] == null || gridsbinding[nextPos].isLucky);
+                    return true;
+                case 4: //down
+                    nextPos = curentPos;
+                    do
+                    {
+                        if (nextPos == totalImgSize * totalImgSize - 1)
+                            nextPos = 0;
+                        else if (nextPos >= totalImgSize * (totalImgSize - 1))
+                            nextPos -= totalImgSize * (totalImgSize - 1) - 1;
+                        else
+                            nextPos += totalImgSize;
+                    } while (gridsbinding[nextPos] == null || gridsbinding[nextPos].isLucky);
+                    return true;
+                default:
+                    return false;
+            }
+            
         }
 
         private void CountDownTimer_Tick(object sender, EventArgs e)
@@ -131,12 +255,9 @@ namespace LuckySpiner
                     break;
                 case -1:
                     btnMode = 0;
-                    animationDuration = 5000;
-                    isRotate = false;
-                    
-                    storyboard.Stop();
-                    doAnimation(rotateMode, animationDuration);
 
+                    stopRotate();
+                    
                     BackgroundWorker bw = new BackgroundWorker();
                     bw.DoWork += Bw_DoWork1;
                     bw.RunWorkerAsync(mainPath);
@@ -157,17 +278,12 @@ namespace LuckySpiner
             cdImg.Visibility = Visibility.Visible;
         }
 
-        //private void RotateAnimation_Completed(object sender, EventArgs e)
-        //{
-        //    rotateMode = !rotateMode;
-        //    storyboard.Stop();
-        //    doAnimation(rotateMode, animationDuration);
-        //}
-
         private void Scroll_ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
             if (!isRotate)
+            {
                 return;
+            }
             string newpth = getPath(e.HorizontalOffset);
             if (newpth == null || string.Equals(newpth, mainPath))
                 return;
@@ -213,7 +329,7 @@ namespace LuckySpiner
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             calculatePosition();
-            doAnimation(rotateMode, animationDuration);
+            freshAnimation();
         }
 
         private bool isCalculate = false;
@@ -260,27 +376,79 @@ namespace LuckySpiner
             }
         }
 
-        private void doAnimation(bool mode, int tpp, double startOffset = -1)//time per page
+        private void freshAnimation()
         {
-            int duration = (int)(scroll.ExtentWidth / scroll.ViewportWidth * tpp);
-            rotateAnimation.From = scroll.HorizontalOffset;
-            if (mode == true) //Left to right
-            {
-                if (startOffset == -1)
-                    rotateAnimation.From = 0;
-                rotateAnimation.To = scroll.ExtentWidth;
-            } else //Righ to left
-            {
-                if (startOffset == -1)
-                    rotateAnimation.From = scroll.ExtentWidth;
-                rotateAnimation.To = 0;
-            }
+            int duration = (int)(scroll.ExtentWidth / scroll.ViewportWidth * 5000);
 
+            rotateAnimation.From = 0;
+            rotateAnimation.To = scroll.ExtentWidth;
             rotateAnimation.Duration = new Duration(TimeSpan.FromMilliseconds(duration));
 
             storyboard.Begin();
         }
 
+        private void scrollAnimation()//time per page
+        {
+            storyboard.Stop();
+            int duration = (int)(scroll.ExtentWidth / scroll.ViewportWidth * 300);
+            
+            rotateAnimation.From = 0;
+            rotateAnimation.To = scroll.ExtentWidth;
+            rotateAnimation.Duration = new Duration(TimeSpan.FromMilliseconds(duration));
+
+            storyboard.Begin();
+        }
+
+
+        private void startRotate()
+        {
+            Random rad = new Random();
+            int temp = rad.Next(6);
+            while (temp == rotateMode)
+                temp = rad.Next(6);
+            rotateMode = temp;
+            isRotate = true;
+            switch (rotateMode)
+            {
+                case 0: //random
+                case 1: //lef to right
+                case 2: //Right to left
+                case 3: //up
+                case 4: //down
+                    scroll.Visibility = Visibility.Hidden;
+                    storyboard.Stop();
+                    rotateTimer.Start();
+                    break;
+                case 5: //scroll
+                    scrollAnimation();
+                    break;
+                default:
+                    break;
+            }
+            
+        }
+
+        private void stopRotate()
+        {
+            isRotate = false;
+            switch (rotateMode)
+            {
+                case 0: //random
+                case 1: //lef to right
+                case 2: //Right to left
+                case 3: //up
+                case 4: //down
+                    grids[curentPos].Visibility = Visibility.Visible;
+                    rotateTimer.Stop();
+                    break;
+                case 5: //scroll
+                    storyboard.Stop();
+                    scroll.Visibility = Visibility.Hidden;
+                    break;
+                default:
+                    break;
+            }
+        }
 
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -288,12 +456,8 @@ namespace LuckySpiner
             if (btnMode == 0)
             {
                 btnMode = 1;
-                animationDuration = 300;
-                isRotate = true;
                 rotateBtn.Content = "Ngừng quay";
-                storyboard.Stop();
-
-                doAnimation(rotateMode, animationDuration);
+                startRotate();
             }
             else
             {
@@ -323,13 +487,13 @@ namespace LuckySpiner
                     break;
                 }
             }
-            System.Threading.Thread.Sleep(2000);
+            System.Threading.Thread.Sleep(1000);
             Dispatcher.Invoke(() => awardImg.Visibility = Visibility.Visible);
             Dispatcher.Invoke(() => winner.Visibility = Visibility.Visible);
             BitmapImage bi2 = new BitmapImage();
             bi2.BeginInit();
             bi2.DecodePixelHeight = 400;
-            bi2.UriSource = new Uri(@"pack://application:,,,/Resources/logo.png");
+            bi2.UriSource = new Uri(logoPath);
             bi2.EndInit();
             bi2.Freeze();
             Dispatcher.Invoke(() => mainImg.Source = bi2);
@@ -348,6 +512,8 @@ namespace LuckySpiner
             awardImg.Visibility = Visibility.Hidden;
             winner.Visibility = Visibility.Hidden;
             rotateBtn.Visibility = Visibility.Visible;
+            scroll.Visibility = Visibility.Visible;
+            freshAnimation();
         }
         private void awardImg_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {

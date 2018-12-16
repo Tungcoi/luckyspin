@@ -12,7 +12,7 @@
         Loaded="Window_Loaded"
         Icon="pack://application:,,,/Resources/windowIcon.png"
         KeyUp="Window_KeyUp"
-        Title="SpinerWindow" Height="300" Width="300">
+        Title="Quay thưởng" Height="300" Width="300">
     <Window.Resources>
         <!--case 2-->
         <Style x:Key="MyFocusVisual2">
@@ -117,10 +117,7 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Grid Grid.RowSpan="8">
-            <Grid.Background>
-                <SolidColorBrush Color="Black" Opacity="0.5" />
-            </Grid.Background>
+        <Grid Grid.RowSpan="8" x:Name="grid">
         </Grid>
 
         <ScrollViewer x:Name="scroll" Grid.Row="3" Grid.RowSpan="2" Background="Transparent" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled">
@@ -131,11 +128,20 @@
             </StackPanel>
             
         </ScrollViewer>
-        <Image x:Name="mainImg" Grid.Row="2" Grid.RowSpan="4" HorizontalAlignment="Center" Source="pack://application:,,,/Resources/logo.png" Stretch="Uniform">
-            <Image.Effect>
+        <Grid Grid.Row="2" Grid.RowSpan="4">
+            <Grid.Effect>
                 <DropShadowEffect BlurRadius="100" ShadowDepth="0" Color="Aqua"/>
-            </Image.Effect>
-        </Image>
+            </Grid.Effect>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Image x:Name="mainImg" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Center" Stretch="Uniform">
+            </Image>
+        </Grid>
+       
         <Button Grid.Row="6" x:Name="rotateBtn" Content="Quay thưởng" Click="Button_Click" Width="120" Height="120" HorizontalAlignment="Center" VerticalContentAlignment="Center" Grid.RowSpan="2" Style="{StaticResource CircleButton}">
             <Button.Effect>
                 <DropShadowEffect BlurRadius="70" ShadowDepth="0" Color="Yellow"/>

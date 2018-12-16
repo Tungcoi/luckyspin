@@ -25,11 +25,13 @@ namespace LuckySpiner
     public partial class MainWindow : Window
     {
         string bgPath;
+        int imgSize;
         public MainWindow()
         {
             InitializeComponent();
             WindowStartupLocation = System.Windows.WindowStartupLocation.CenterScreen;
             bgPath = "";
+            imgSize = -1;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -45,15 +47,17 @@ namespace LuckySpiner
                     imgs.Add(path);
                 }
 
-                //testimg(imgs);
+                if (imgs.Count < 30)
+                {
+                    MessageBox.Show("Số lượng ảnh quá ít.", " Không thể khởi tạo chương trình!!!", MessageBoxButton.OK);
+                    return;
+                }
                 BackgroundWorker worker = new BackgroundWorker();
                 worker.DoWork += Worker_DoWork;
                 worker.RunWorkerCompleted += Worker_RunWorkerCompleted;
                 worker.ProgressChanged += Worker_ProgressChanged;
                 worker.WorkerReportsProgress = true;
                 worker.RunWorkerAsync(imgs);
-
-
             }
             
         }
@@ -67,7 +71,7 @@ namespace LuckySpiner
             {
                 case 0:
                     btn.Content = "Vui lòng chọn ảnh";
-                    bgPath = e.UserState.ToString();
+                    
                     btn.IsEnabled = true;
                     break;
                 case 1:
@@ -85,7 +89,13 @@ namespace LuckySpiner
                 case 4:
                     btn.Content = "Đang khởi tạo cửa sổ mới. Vui lòng đợi!!!";
                     btn.IsEnabled = false;
+                    bgPath = e.UserState.ToString();
                     break;
+                //case 4:
+                //    btn.Content = "Đang khởi tạo cửa sổ mới. Vui lòng đợi!!!";
+                //    btn.IsEnabled = false;
+                //    bgPath = e.UserState.ToString();
+                //    break;
                 case 100:
                     MessageBox.Show("Vui lòng kiểm tra lại ảnh:" + e.UserState.ToString());
                     this.Close();
@@ -99,7 +109,7 @@ namespace LuckySpiner
             if (String.IsNullOrEmpty(bgPath))
                 return;
             List<String> data = e.Result as List<String>;
-            SpinerWindow wd = new SpinerWindow(bgPath, data);
+            SpinerWindow wd = new SpinerWindow(logoPath,bgPath, data, imgSize);
             wd.Show();
             this.Close();
         }
@@ -113,19 +123,22 @@ namespace LuckySpiner
             //make background image
             int imgWidth = 3840;
             int imgHeight = 2160;
-            int imgSize = 1;
-            while (imgSize * imgSize < imgsPth.Count) imgSize++;
+            imgSize = 4;
+            while ((imgSize * imgSize * 3 / 4) < imgsPth.Count) imgSize+= 4;
             int tileWidth = imgWidth / imgSize;
             int tileHeight = imgHeight / imgSize;
             DrawingVisual drawingVisual = new DrawingVisual();
+            int pos = 0;
             using (DrawingContext drawingContext = drawingVisual.RenderOpen())
             {
                 for (int i = 0; i < imgSize; i++)
                 {
                     for (int j = 0; j < imgSize; j++)
                     {
-                        int pos = (i * imgSize + j) % imgsPth.Count;
-                        if ((i * imgSize + j) < imgsPth.Count) 
+                        //int pos = (i * imgSize + j) % imgsPth.Count;
+                        if (i >= (imgSize / 4) && i < (imgSize * 3 / 4) && j >= (imgSize / 4) && j < (imgSize * 3 / 4)) //mainImage 
+                            continue;
+                        if (pos < imgsPth.Count) 
                             worker.ReportProgress(1, String.Format(" - {0}({1}/{2})", System.IO.Path.GetFileName(imgsPth[pos]), pos + 1, imgSize * imgSize));
                         string pth = imgsPth[pos];
                         BitmapImage bi = new BitmapImage();
@@ -153,6 +166,7 @@ namespace LuckySpiner
                         }
                         drawingContext.DrawImage(bi, new Rect(i * tileWidth + 1, j * tileHeight + 1, tileWidth - 2, tileHeight - 2));
                         GC.Collect();
+                        pos = (pos  + 1) % imgsPth.Count;
                     }
                 }
             }
@@ -168,12 +182,46 @@ namespace LuckySpiner
             string mypicpath = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures) + @"\LuckySpinerBackground.png";
             using (Stream stream = File.Create(mypicpath))
                 encoder.Save(stream);
-
-            e.Result = imgsPth;
+            
+            worker.ReportProgress(4, mypicpath);
+            //worker.ReportProgress(5, imgSize);
             //done
-            worker.ReportProgress(0, mypicpath);
+            e.Result = imgsPth;
         }
 
+        private string logoPath;
 
+        private void btnLogo_Click(object sender, RoutedEventArgs e)
+        {
+            var dlg = new OpenFileDialog();
+            if (dlg.ShowDialog() == true)
+            {
+                lb.Foreground = Brushes.Black;
+                lb.Content = "Logo file:" + dlg.FileName;
+                logoPath = dlg.FileName;
+                try
+                {
+                    BitmapImage bmp = new BitmapImage();
+                    bmp.BeginInit();
+                    bmp.UriSource = new Uri(logoPath);
+                    bmp.EndInit();
+                    img.Source = bmp;
+                    btn.IsEnabled = true;
+                }catch (Exception ex)
+                {
+                    lb.Foreground = Brushes.Red;
+                    lb.Content = "Không thể load logo!!!";
+                    btn.IsEnabled = false;
+                    string mydocpath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+
+                    // Append text to an existing file named "WriteLines.txt".
+                    using (StreamWriter outputFile = new StreamWriter(System.IO.Path.Combine(mydocpath, "LuckySpinerLog.txt"), true))
+                    {
+                        outputFile.WriteLine(DateTime.Now.ToString());
+                        outputFile.WriteLine(ex.Message);
+                    }
+                }
+            }
+        }
     }
 }
