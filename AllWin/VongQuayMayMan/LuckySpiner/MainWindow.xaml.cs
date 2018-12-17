@@ -129,18 +129,25 @@ namespace LuckySpiner
             int tileHeight = imgHeight / imgSize;
             DrawingVisual drawingVisual = new DrawingVisual();
             int pos = 0;
+            Random ran = new Random();
             using (DrawingContext drawingContext = drawingVisual.RenderOpen())
             {
                 for (int i = 0; i < imgSize; i++)
                 {
                     for (int j = 0; j < imgSize; j++)
                     {
+                        string pth = imgsPth[pos];
                         //int pos = (i * imgSize + j) % imgsPth.Count;
                         if (i >= (imgSize / 4) && i < (imgSize * 3 / 4) && j >= (imgSize / 4) && j < (imgSize * 3 / 4)) //mainImage 
-                            continue;
-                        if (pos < imgsPth.Count) 
-                            worker.ReportProgress(1, String.Format(" - {0}({1}/{2})", System.IO.Path.GetFileName(imgsPth[pos]), pos + 1, imgSize * imgSize));
-                        string pth = imgsPth[pos];
+                        {
+                            pth = imgsPth[ran.Next(imgsPth.Count)];
+                        } else
+                        {
+                            pos = (pos + 1) % imgsPth.Count;
+                        }
+                        if ( (i * imgSize + j) < imgsPth.Count) 
+                            worker.ReportProgress(1, String.Format(" - {0}({1}/{2})", System.IO.Path.GetFileName(pth), pos, imgSize * imgSize));
+                        
                         BitmapImage bi = new BitmapImage();
                         bi.BeginInit();
                         bi.DecodePixelWidth = tileWidth;
@@ -166,7 +173,6 @@ namespace LuckySpiner
                         }
                         drawingContext.DrawImage(bi, new Rect(j * tileWidth + 1, i * tileHeight + 1, tileWidth - 2, tileHeight - 2));
                         GC.Collect();
-                        pos = (pos  + 1) % imgsPth.Count;
                     }
                 }
             }
